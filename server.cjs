@@ -2,11 +2,15 @@ const express = require("express");
 const cors = require("cors");
 const sqlite3 = require("sqlite3").verbose();
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const db = new sqlite3.Database("database.db");
+
+const db = new sqlite3.Database("students.db");
+
+db.run("DELETE FROM students");
 
 db.run(`CREATE TABLE IF NOT EXISTS students(
  id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,15 +18,20 @@ db.run(`CREATE TABLE IF NOT EXISTS students(
  email TEXT
 )`);
 
+
 app.get("/students",(req,res)=>{
- db.all("SELECT * FROM students",(err,rows)=>{
-  if(err) res.send(err);
-  else res.json(rows);
- });
+
+db.all("SELECT * FROM students ORDER BY id DESC LIMIT 1",[],(err,rows)=>{
+res.json(rows);
+});
+
+
+
 });
 
 app.post("/add",(req,res)=>{
  const {name,email} = req.body;
+
 
  db.run(
   "INSERT INTO students(name,email) VALUES(?,?)",
@@ -33,6 +42,7 @@ app.post("/add",(req,res)=>{
   }
  );
 });
+d
 
 app.listen(5000,()=>{
  console.log("Server running on port 5000");
@@ -40,3 +50,6 @@ app.listen(5000,()=>{
 app.get("/", (req,res)=>{
   res.send("Node Server Running");
 });
+
+
+
